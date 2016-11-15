@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
-require "mediawiki_api"
-require "HTTParty"
-require "csv"
+require 'mediawiki_api'
+require 'HTTParty'
+require 'csv'
 require 'open-uri'
 require './helper'
 
@@ -28,17 +28,17 @@ end
 
 Helper.read_env_vars
 
-client = MediawikiApi::Client.new "https://en.wikipedia.org/w/api.php"
-client.log_in ENV["USERNAME"], ENV["PASSWORD"]
+client = MediawikiApi::Client.new 'https://en.wikipedia.org/w/api.php'
+client.log_in ENV['USERNAME'], ENV['PASSWORD']
 
-books = CSV.read("books.csv.txt").drop(1)
+books = CSV.read('books.csv.txt').drop(1)
 
 books.each do |title, url|
-  puts "#{title}"
+  puts title.to_s
   text = client.get_wikitext(title).body
   extension = File.extname(url)
 
-  #Make sure "| image = " only appears once
+  # Make sure "| image = " only appears once
   image_count = text.scan(IMAGE_REGEX).size
 
   if image_count > 1
@@ -46,7 +46,7 @@ books.each do |title, url|
     next
   end
 
-  if text.scan(/author\s*=\s*/).size == 0
+  if text.scan(/author\s*=\s*/).empty?
     puts "- ERROR: #{title} couldn't be processed. No author is present on the page!"
     next
   end
@@ -58,23 +58,19 @@ books.each do |title, url|
   end
 
   begin
-    client.upload_image("#{title.gsub(":", " -")}#{extension}","book_covers/#{title}#{extension}", comment(title, author, url), false)
+    client.upload_image("#{title.gsub(':', ' -')}#{extension}", "book_covers/#{title}#{extension}", comment(title, author, url), false)
   rescue Exception => e
     puts "- ERROR: #{e}"
     next
   end
 
   if image_count == 0
-    puts "- NOTE: image = did not appear in original text"
-    text.gsub!(/(\{\{Infobox book)(\n\|\s*name\s*=.*)?/, "\\1\\2\n| image = #{title.gsub(":", " -")}#{extension}")
+    puts '- NOTE: image = did not appear in original text'
+    text.gsub!(/(\{\{Infobox book)(\n\|\s*name\s*=.*)?/, "\\1\\2\n| image = #{title.gsub(':', ' -')}#{extension}")
   else
-    puts "- NOTE: Image inserted as normal"
-    text.gsub!(IMAGE_REGEX, "\\1 #{title.gsub(":", " -")}#{extension}")
+    puts '- NOTE: Image inserted as normal'
+    text.gsub!(IMAGE_REGEX, "\\1 #{title.gsub(':', ' -')}#{extension}")
   end
 
-  client.edit(title: title, text: text, summary: "Adding image")
+  client.edit(title: title, text: text, summary: 'Adding image')
 end
-
-
-
-
