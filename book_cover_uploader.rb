@@ -33,8 +33,6 @@ client.log_in ENV["USERNAME"], ENV["PASSWORD"]
 
 books = CSV.read("books.csv.txt").drop(1)
 
-#TODO: figure out the file extension to use based on the URL
-
 books.each do |title, url|
   puts "#{title}"
   text = client.get_wikitext(title).body
@@ -65,7 +63,6 @@ books.each do |title, url|
     puts "- ERROR: #{e}"
     next
   end
-
 
   if image_count == 0
     puts "- NOTE: image = did not appear in original text"
