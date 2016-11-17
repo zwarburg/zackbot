@@ -7,4 +7,21 @@ class Helper
       ENV[var] = value
     end
   end
+
+  def self.split_dep_vars(s) #team, years, split = "<br>", type = "coach")
+    parsed = s.match(/\|\s*(?<type>.*)\_teams\s*=\s*(?<team>.*)\n*\|\s*.*\_years\s*=\s*(?<years>.*)/)
+
+    split = s.match(/<br[\s\/]*>/)[0]
+
+    team = parsed[:team].split(split)
+    years = parsed[:years].split(split)
+    type = parsed[:type]
+
+    result = ""
+    team.each_with_index do |team, count|
+      result+="| #{type}_team#{count+1}  = #{team}\n| #{type}_years#{count+1} = #{years[count]}\n"
+    end
+    puts result
+  end
+
 end
