@@ -24,7 +24,7 @@ def comment(title, author, url)
 }}
 
 ==Licensing==
-{{Non-free book cover}}"
+{{Non-free book cover|image has rationale=yes|category=Biography book cover images}}"
 end
 
 Helper.read_env_vars
